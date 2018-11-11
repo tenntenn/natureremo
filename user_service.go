@@ -7,8 +7,11 @@ import (
 	"github.com/pkg/errors"
 )
 
+// UserService is get or update own user data.
 type UserService interface {
+	// Me gets own user data.
 	Me(ctx context.Context) (*User, error)
+	// UpdateNickname updates nickname.
 	UpdateNickname(ctx context.Context, nickname string) error
 }
 
@@ -16,6 +19,7 @@ type userService struct {
 	cli *Client
 }
 
+// Me sends GET request to /1/users/me.
 func (s *userService) Me(ctx context.Context) (*User, error) {
 	var u User
 	if err := s.cli.get(ctx, "users/me", nil, &u); err != nil {
@@ -24,6 +28,7 @@ func (s *userService) Me(ctx context.Context) (*User, error) {
 	return &u, nil
 }
 
+// UpdateNickname sends POST request to /1/users/me.
 func (s *userService) UpdateNickname(ctx context.Context, nickname string) error {
 	data := url.Values{}
 	data.Set("nickname", nickname)
