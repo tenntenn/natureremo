@@ -16,6 +16,7 @@ http://swagger.nature.global
 |-----------------------------------------|:------:|:----------------:|
 |/1/users/me                              | GET    |:heavy_check_mark:|
 |/1/users/me                              | POST   |:heavy_check_mark:|
+|/1/devices                               | GET    |:heavy_check_mark:|
 |/1/detectappliance                       | POST   |                  |
 |/1/appliances                            | GET    |                  |
 |/1/appliances                            | POST   |                  |
