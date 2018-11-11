@@ -19,8 +19,9 @@ const (
 var apiURL = baseURL + version
 
 type Client struct {
-	UserService   UserService
-	DeviceService DeviceService
+	UserService      UserService
+	DeviceService    DeviceService
+	ApplianceService ApplianceService
 
 	HTTPClient  *http.Client
 	AccessToken string
@@ -31,6 +32,7 @@ func NewClient(accessToken string) *Client {
 	cli.AccessToken = accessToken
 	cli.UserService = &userService{cli: &cli}
 	cli.DeviceService = &deviceService{cli: &cli}
+	cli.ApplianceService = &applianceService{cli: &cli}
 	return &cli
 }
 
@@ -86,6 +88,9 @@ func (cli *Client) postForm(ctx context.Context, path string, data url.Values, v
 	resp, err := cli.do(ctx, req)
 	if err != nil {
 		return err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return errors.Errorf("request failed with status code %d", resp.StatusCode)
 	}
 
 	if v == nil {

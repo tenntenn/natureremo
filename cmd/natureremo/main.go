@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"encoding/json"
 	"os"
 
 	"github.com/tenntenn/natureremo"
@@ -10,11 +10,9 @@ import (
 
 func main() {
 	cli := natureremo.NewClient(os.Args[1])
-	ds, err := cli.DeviceService.Devices(context.Background())
+	vs, err := cli.ApplianceService.GetAll(context.Background())
 	if err != nil {
 		panic(err)
 	}
-	for i := range ds {
-		fmt.Println(ds[i])
-	}
+	json.NewEncoder(os.Stdout).Encode(vs)
 }
