@@ -17,7 +17,7 @@ func main() {
 		panic(err)
 	}
 
-	a, err := cli.ApplianceService.New(ctx, "test", ds[0].ID, "ico_ac_1")
+	a, err := cli.ApplianceService.New(ctx, ds[0], "test", "ico_ac_1")
 	if err != nil {
 		panic(err)
 	}

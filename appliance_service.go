@@ -12,11 +12,9 @@ import (
 type ApplianceService interface {
 	Detect(ctx context.Context, ir *IRSignal) ([]*DetectedAircon, error)
 	GetAll(ctx context.Context) ([]*Appliance, error)
-	New(ctx context.Context, nickname, device, image string) (*Appliance, error)
-	NewWithModel(ctx context.Context, nickname, model, device, image string) (*Appliance, error)
-	/*
-		GetOrders(ctx context.Context)
-	*/
+	New(ctx context.Context, device *Device, nickname, image string) (*Appliance, error)
+	NewWithModel(ctx context.Context, device *Device, nickname, model, image string) (*Appliance, error)
+	//GetOrders(ctx context.Context, appliances []*Appliance) ([]*Appliance, error)
 }
 
 type applianceService struct {
@@ -46,17 +44,17 @@ func (s *applianceService) GetAll(ctx context.Context) ([]*Appliance, error) {
 	return as, nil
 }
 
-func (s *applianceService) New(ctx context.Context, nickname, device, image string) (*Appliance, error) {
-	return s.NewWithModel(ctx, nickname, "", device, image)
+func (s *applianceService) New(ctx context.Context, device *Device, nickname, image string) (*Appliance, error) {
+	return s.NewWithModel(ctx, device, nickname, image, "")
 }
 
-func (s *applianceService) NewWithModel(ctx context.Context, nickname, model, device, image string) (*Appliance, error) {
+func (s *applianceService) NewWithModel(ctx context.Context, device *Device, nickname, image, model string) (*Appliance, error) {
 	data := url.Values{}
 	data.Set("nickname", nickname)
 	if model != "" {
 		data.Set("model", model)
 	}
-	data.Set("device", device)
+	data.Set("device", device.ID)
 	data.Set("image", image)
 
 	var a Appliance
