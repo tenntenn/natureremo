@@ -24,12 +24,12 @@ http://swagger.nature.global
 |/1/appliances/{appliance}/delete         | POST   |:heavy_check_mark:|
 |/1/appliances/{appliance}                | POST   |:heavy_check_mark:|
 |/1/appliances/{appliance}/aircon_settings| POST   |:heavy_check_mark:|
-|/1/appliances/{appliance}/signals        | GET    |                  |
-|/1/appliances/{appliance}/signals        | POST   |                  |
-|/1/appliances/{appliance}/signal_orders  | POST   |                  |
-|/1/signals/{signal}                      | POST   |                  |
-|/1/signals/{signal}/delete               | POST   |                  |
-|/1/signals/{signal}/send                 | POST   |                  |
+|/1/appliances/{appliance}/signals        | GET    |:heavy_check_mark:|
+|/1/appliances/{appliance}/signals        | POST   |:heavy_check_mark:|
+|/1/appliances/{appliance}/signal_orders  | POST   |:heavy_check_mark:|
+|/1/signals/{signal}                      | POST   |:heavy_check_mark:|
+|/1/signals/{signal}/delete               | POST   |:heavy_check_mark:|
+|/1/signals/{signal}/send                 | POST   |:heavy_check_mark:|
 |/1/devices/{device}                      | POST   |                  |
 |/1/devices/{device}/delete               | POST   |                  |
 |/1/devices/{device}/temperature_offset   | POST   |                  |

@@ -20,12 +20,16 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
 	for _, a := range as {
-		if a.AirConSettings != nil {
-			s := *(a.AirConSettings)
-			s.OperationMode = natureremo.OperationModeWarm
-			cli.ApplianceService.UpdateAirConSettings(ctx, a, &s)
-			break
+		if a.Nickname == "テレビ" {
+			for _, s := range a.Signals {
+				if s.Name == "日テレ" {
+					if err := cli.SignalService.Send(ctx, s); err != nil {
+						panic(err)
+					}
+				}
+			}
 		}
 	}
 }

@@ -24,6 +24,7 @@ type Client struct {
 	UserService      UserService
 	DeviceService    DeviceService
 	ApplianceService ApplianceService
+	SignalService    SignalService
 
 	HTTPClient  *http.Client
 	AccessToken string
@@ -35,6 +36,7 @@ func NewClient(accessToken string) *Client {
 	cli.UserService = &userService{cli: &cli}
 	cli.DeviceService = &deviceService{cli: &cli}
 	cli.ApplianceService = &applianceService{cli: &cli}
+	cli.SignalService = &signalService{cli: &cli}
 	return &cli
 }
 

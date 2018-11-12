@@ -11,8 +11,8 @@ import (
 type UserService interface {
 	// Me gets own user data.
 	Me(ctx context.Context) (*User, error)
-	// UpdateNickname updates nickname.
-	UpdateNickname(ctx context.Context, nickname string) (*User, error)
+	// Update updates user data.
+	Update(ctx context.Context, u *User) (*User, error)
 }
 
 type userService struct {
@@ -28,13 +28,13 @@ func (s *userService) Me(ctx context.Context) (*User, error) {
 	return &u, nil
 }
 
-// UpdateNickname sends POST request to /1/users/me.
-func (s *userService) UpdateNickname(ctx context.Context, nickname string) (*User, error) {
+// Update sends POST request to /1/users/me.
+func (s *userService) Update(ctx context.Context, me *User) (*User, error) {
 	data := url.Values{}
-	data.Set("nickname", nickname)
+	data.Set("nickname", me.Nickname)
 	var u User
 	if err := s.cli.postForm(ctx, "users/me", data, &u); err != nil {
-		return nil, errors.Wrapf(err, "POST users/me failed with %s", nickname)
+		return nil, errors.Wrapf(err, "POST users/me failed with %#v", me)
 	}
 	return &u, nil
 }
