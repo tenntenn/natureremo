@@ -8,7 +8,7 @@ $ go get -u github.com/tenntenn/natureremo
 
 ## Supported API
 
-### Global API
+### Cloud API
 
 http://swagger.nature.global
 
