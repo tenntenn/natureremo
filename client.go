@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -64,10 +66,12 @@ func (cli *Client) get(ctx context.Context, path string, params url.Values, v in
 	if err != nil {
 		return err
 	}
-	if resp.StatusCode != http.StatusOK {
-		return errors.Errorf("request failed with status code %d", resp.StatusCode)
-	}
+
 	defer resp.Body.Close()
+
+	if !(resp.StatusCode >= http.StatusOK && resp.StatusCode < http.StatusMultipleChoices) {
+		return cli.error(resp.StatusCode, resp.Body)
+	}
 
 	if err := json.NewDecoder(resp.Body).Decode(v); err != nil {
 		return errors.Wrap(err, "cannot parse HTTP body")
@@ -89,19 +93,28 @@ func (cli *Client) postForm(ctx context.Context, path string, data url.Values, v
 	if err != nil {
 		return err
 	}
-	if resp.StatusCode != http.StatusOK {
-		return errors.Errorf("request failed with status code %d", resp.StatusCode)
+
+	defer resp.Body.Close()
+
+	if !(resp.StatusCode >= http.StatusOK && resp.StatusCode < http.StatusMultipleChoices) {
+		return cli.error(resp.StatusCode, resp.Body)
 	}
 
 	if v == nil {
 		return nil
 	}
 
-	defer resp.Body.Close()
-
 	if err := json.NewDecoder(resp.Body).Decode(v); err != nil {
 		return errors.Wrap(err, "cannot parse HTTP body")
 	}
 
 	return nil
+}
+
+func (cli *Client) error(statusCode int, body io.Reader) error {
+	buf, err := ioutil.ReadAll(body)
+	if err != nil || len(buf) == 0 {
+		return errors.Errorf("request failed with status code %d", statusCode)
+	}
+	return errors.Errorf("StatusCode: %d, Error: %s", statusCode, string(buf))
 }

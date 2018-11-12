@@ -12,7 +12,7 @@ type UserService interface {
 	// Me gets own user data.
 	Me(ctx context.Context) (*User, error)
 	// UpdateNickname updates nickname.
-	UpdateNickname(ctx context.Context, nickname string) error
+	UpdateNickname(ctx context.Context, nickname string) (*User, error)
 }
 
 type userService struct {
@@ -29,11 +29,12 @@ func (s *userService) Me(ctx context.Context) (*User, error) {
 }
 
 // UpdateNickname sends POST request to /1/users/me.
-func (s *userService) UpdateNickname(ctx context.Context, nickname string) error {
+func (s *userService) UpdateNickname(ctx context.Context, nickname string) (*User, error) {
 	data := url.Values{}
 	data.Set("nickname", nickname)
-	if err := s.cli.postForm(ctx, "users/me", data, nil); err != nil {
-		return errors.Wrapf(err, "POST users/me failed with %s", nickname)
+	var u User
+	if err := s.cli.postForm(ctx, "users/me", data, &u); err != nil {
+		return nil, errors.Wrapf(err, "POST users/me failed with %s", nickname)
 	}
-	return nil
+	return &u, nil
 }
