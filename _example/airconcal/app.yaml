@@ -1,0 +1,12 @@
+runtime: go
+api_version: go1.9
+module: airconcal
+
+handlers:
+- url: /.*
+  script: _go_app
+  secure: always
+
+env_variables:
+  NATUREREMO_TOKEN: "Your Token"
+  WEBHOOK_SECRET: "Your Secret"
