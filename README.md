@@ -30,7 +30,7 @@ http://swagger.nature.global
 |/1/signals/{signal}                      | POST   |:heavy_check_mark:|
 |/1/signals/{signal}/delete               | POST   |:heavy_check_mark:|
 |/1/signals/{signal}/send                 | POST   |:heavy_check_mark:|
-|/1/devices/{device}                      | POST   |                  |
-|/1/devices/{device}/delete               | POST   |                  |
-|/1/devices/{device}/temperature_offset   | POST   |                  |
-|/1/devices/{device}/humidity_offset      | POST   |                  |
+|/1/devices/{device}                      | POST   |:heavy_check_mark:|
+|/1/devices/{device}/delete               | POST   |:heavy_check_mark:|
+|/1/devices/{device}/temperature_offset   | POST   |:heavy_check_mark:|
+|/1/devices/{device}/humidity_offset      | POST   |:heavy_check_mark:|
