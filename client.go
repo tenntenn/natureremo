@@ -104,6 +104,45 @@ func (cli *Client) postForm(ctx context.Context, path string, data url.Values, v
 		return nil
 	}
 
+	var respBody io.Reader = resp.Body
+
+	// For Debug
+	//var buf bytes.Buffer
+	//if _, err := buf.ReadFrom(resp.Body); err != nil {
+	//	return errors.Wrap(err, "cannot read HTTP body")
+	//}
+	//fmt.Println(buf.String())
+	//respBody = &buf
+
+	if err := json.NewDecoder(respBody).Decode(v); err != nil {
+		return errors.Wrap(err, "cannot parse HTTP body")
+	}
+
+	return nil
+}
+
+func (cli *Client) post(ctx context.Context, path string, v interface{}) error {
+	reqURL := apiURL + "/" + path
+	req, err := http.NewRequest(http.MethodPost, reqURL, nil)
+	if err != nil {
+		return errors.Wrap(err, "cannot create HTTP request")
+	}
+
+	resp, err := cli.do(ctx, req)
+	if err != nil {
+		return err
+	}
+
+	defer resp.Body.Close()
+
+	if !(resp.StatusCode >= http.StatusOK && resp.StatusCode < http.StatusMultipleChoices) {
+		return cli.error(resp.StatusCode, resp.Body)
+	}
+
+	if v == nil {
+		return nil
+	}
+
 	if err := json.NewDecoder(resp.Body).Decode(v); err != nil {
 		return errors.Wrap(err, "cannot parse HTTP body")
 	}
