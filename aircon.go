@@ -15,6 +15,10 @@ type AirConParams struct {
 
 type OperationMode string
 
+func (om OperationMode) StringValue() string {
+	return string(om)
+}
+
 const (
 	OperationModeAuto OperationMode = "auto"
 	OperationModeCool OperationMode = "cool"
@@ -30,6 +34,10 @@ type AirConRangeMode struct {
 }
 
 type AirVolume string
+
+func (v AirVolume) StringValue() string {
+	return string(v)
+}
 
 const (
 	AirVolumeAuto = ""
@@ -47,11 +55,19 @@ const (
 
 type AirDirection string
 
+func (d AirDirection) StringValue() string {
+	return string(d)
+}
+
 const (
 	AirDirectionAuto AirDirection = ""
 )
 
 type Button string
+
+func (b Button) StringValue() string {
+	return string(b)
+}
 
 const (
 	ButtonPowerOn  Button = ""

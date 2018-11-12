@@ -16,13 +16,13 @@ type ApplianceModel struct {
 }
 
 type Appliance struct {
-	ID       string          `json:"id"`
-	Device   *DeviceCore     `json:"device"`
-	Model    *ApplianceModel `json:"model"`
-	Nickname string          `json:"nickname"`
-	Image    string          `json:"image"`
-	Type     ApplianceType   `json:"type"`
-	Settings *AirConParams   `json:"settings"`
-	AirCon   *AirCon         `json:"aircon"`
-	Signals  []*Signal       `json:"signals"`
+	ID             string          `json:"id"`
+	Device         *DeviceCore     `json:"device"`
+	Model          *ApplianceModel `json:"model"`
+	Nickname       string          `json:"nickname"`
+	Image          string          `json:"image"`
+	Type           ApplianceType   `json:"type"`
+	AirConSettings *AirConParams   `json:"settings"`
+	AirCon         *AirCon         `json:"aircon"`
+	Signals        []*Signal       `json:"signals"`
 }

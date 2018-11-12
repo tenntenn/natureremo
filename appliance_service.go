@@ -18,6 +18,8 @@ type ApplianceService interface {
 	NewWithModel(ctx context.Context, device *Device, nickname, model, image string) (*Appliance, error)
 	ReOrder(ctx context.Context, appliances []*Appliance) error
 	Delete(ctx context.Context, appliance *Appliance) error
+	Update(ctx context.Context, appliance *Appliance) (*Appliance, error)
+	UpdateAirConSettings(ctx context.Context, appliance *Appliance, settings *AirConParams) error
 }
 
 type applianceService struct {
@@ -86,6 +88,36 @@ func (s *applianceService) Delete(ctx context.Context, appliance *Appliance) err
 	path := fmt.Sprintf("appliances/%s/delete", appliance.ID)
 	if err := s.cli.post(ctx, path, nil); err != nil {
 		return errors.Wrapf(err, "POST %s", path)
+	}
+	return nil
+}
+
+func (s *applianceService) Update(ctx context.Context, appliance *Appliance) (*Appliance, error) {
+	path := fmt.Sprintf("appliances/%s", appliance.ID)
+
+	data := url.Values{}
+	data.Set("image", appliance.Image)
+	data.Set("nickname", appliance.Nickname)
+
+	var a Appliance
+	if err := s.cli.postForm(ctx, path, data, &a); err != nil {
+		return nil, errors.Wrapf(err, "POST %s with %#v", path, data)
+	}
+	return &a, nil
+}
+
+func (s *applianceService) UpdateAirConSettings(ctx context.Context, appliance *Appliance, settings *AirConParams) error {
+	path := fmt.Sprintf("appliances/%s/aircon_settings", appliance.ID)
+
+	data := url.Values{}
+	data.Set("temperature", settings.Temperature)
+	data.Set("operation_mode", settings.OperationMode.StringValue())
+	data.Set("air_volume", settings.AirVolume.StringValue())
+	data.Set("air_direction", settings.AirDirection.StringValue())
+	data.Set("button", settings.Button.StringValue())
+
+	if err := s.cli.postForm(ctx, path, data, nil); err != nil {
+		return errors.Wrapf(err, "POST %s with %#v", path, data)
 	}
 	return nil
 }
