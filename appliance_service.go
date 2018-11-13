@@ -35,7 +35,7 @@ type applianceService struct {
 	cli *Client
 }
 
-func (s *applianceService) Detect(ctx context.Context, ir *IRSignal) ([]*DetectedAircon, error) {
+func (s *applianceService) Detect(ctx context.Context, ir *IRSignal) ([]*DetectedAirCon, error) {
 	data := url.Values{}
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(ir); err != nil {
@@ -43,7 +43,7 @@ func (s *applianceService) Detect(ctx context.Context, ir *IRSignal) ([]*Detecte
 	}
 
 	data.Set("message", buf.String())
-	var aircons []*DetectedAircon
+	var aircons []*DetectedAirCon
 	if err := s.cli.postForm(ctx, "detectappliance", data, &aircons); err != nil {
 		return nil, errors.Wrapf(err, "POST detectappliance failed with %#v", ir)
 	}
