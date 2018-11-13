@@ -3,6 +3,9 @@
 [godoc]: http://godoc.org/github.com/tenntenn/natureremo
 [travis]: https://travis-ci.org/tenntenn/natureremo
 
+`tenntenn/natureremo` is [Nature Remo API](https://developer.nature.global/en/overview/) Client for Go.
+[Nature Remo](https://nature.global/en/top) is a smart remote control that easily realizes smart home by connecting your appliances to the Internet.
+
 ## Install
 
 ```
