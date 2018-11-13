@@ -78,3 +78,13 @@ http://swagger.nature.global
 |:heavy_check_mark:|/1/signals/{signal}                      | POST        |[SignalService](https://godoc.org/github.com/tenntenn/natureremo#SignalService)   |
 |:heavy_check_mark:|/1/signals/{signal}/delete               | POST        |[SignalService](https://godoc.org/github.com/tenntenn/natureremo#SignalService)   |
 |:heavy_check_mark:|/1/signals/{signal}/send                 | POST        |[SignalService](https://godoc.org/github.com/tenntenn/natureremo#SignalService)   |
+
+### Local API
+
+http://local.swagger.nature.global/
+
+|     Status       |Endpoint | HTTP Method |LocalClient Method|
+|:----------------:|---------|:-----------:|------------------|
+|:heavy_check_mark:|/messages| GET         |[Fetch](https://godoc.org/github.com/tenntenn/natureremo#LocalClient.Fetch)|
+|:heavy_check_mark:|/messages| POST        |[Emit](https://godoc.org/github.com/tenntenn/natureremo#LocalClient.Emit) |
+
