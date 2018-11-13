@@ -11,15 +11,24 @@ import (
 	"github.com/pkg/errors"
 )
 
+// ApplianceService provides interface of Nature Remo APIs which are related to appliances.
 type ApplianceService interface {
-	Detect(ctx context.Context, ir *IRSignal) ([]*DetectedAircon, error)
+	// Detect detects air conditioners by an infrared ray signal.
+	Detect(ctx context.Context, ir *IRSignal) ([]*DetectedAirCon, error)
+	// GetAll gets all appliances.
 	GetAll(ctx context.Context) ([]*Appliance, error)
+	// New creates new appliance and links to specified device.
 	New(ctx context.Context, device *Device, nickname, image string) (*Appliance, error)
-	NewWithModel(ctx context.Context, device *Device, nickname, model, image string) (*Appliance, error)
+	// NewWithModel creates new appliance with specified model.
+	NewWithModel(ctx context.Context, device *Device, nickname, image string, model *ApplianceModel) (*Appliance, error)
+	// ReOrder arranges appliances by given orders.
 	ReOrder(ctx context.Context, appliances []*Appliance) error
+	// Delete deletes specified appliance.
 	Delete(ctx context.Context, appliance *Appliance) error
+	// Update updates specified appliance.
 	Update(ctx context.Context, appliance *Appliance) (*Appliance, error)
-	UpdateAirConSettings(ctx context.Context, appliance *Appliance, settings *AirConParams) error
+	// UpdateAirConSettings updates air conditioner settings of specified appliance.
+	UpdateAirConSettings(ctx context.Context, appliance *Appliance, settings *AirConSettings) error
 }
 
 type applianceService struct {
@@ -50,14 +59,14 @@ func (s *applianceService) GetAll(ctx context.Context) ([]*Appliance, error) {
 }
 
 func (s *applianceService) New(ctx context.Context, device *Device, nickname, image string) (*Appliance, error) {
-	return s.NewWithModel(ctx, device, nickname, image, "")
+	return s.NewWithModel(ctx, device, nickname, image, nil)
 }
 
-func (s *applianceService) NewWithModel(ctx context.Context, device *Device, nickname, image, model string) (*Appliance, error) {
+func (s *applianceService) NewWithModel(ctx context.Context, device *Device, nickname, image string, model *ApplianceModel) (*Appliance, error) {
 	data := url.Values{}
 	data.Set("nickname", nickname)
-	if model != "" {
-		data.Set("model", model)
+	if model != nil {
+		data.Set("model", model.ID)
 	}
 	data.Set("device", device.ID)
 	data.Set("image", image)
@@ -106,7 +115,7 @@ func (s *applianceService) Update(ctx context.Context, appliance *Appliance) (*A
 	return &a, nil
 }
 
-func (s *applianceService) UpdateAirConSettings(ctx context.Context, appliance *Appliance, settings *AirConParams) error {
+func (s *applianceService) UpdateAirConSettings(ctx context.Context, appliance *Appliance, settings *AirConSettings) error {
 	path := fmt.Sprintf("appliances/%s/aircon_settings", appliance.ID)
 
 	data := url.Values{}

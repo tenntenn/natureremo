@@ -1,4 +1,7 @@
-# Nature Remo API Client for Go
+# Nature Remo API Client for Go [![Go Documentation](http://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)][godoc] [![Travis](https://img.shields.io/travis/tenntenn/natureremo.svg?style=flat-square)][travis] [![Go Report Card](https://goreportcard.com/badge/github.com/tenntenn/natureremo)](https://goreportcard.com/report/github.com/tenntenn/natureremo) [![codecov](https://codecov.io/gh/tenntenn/natureremo/branch/master/graph/badge.svg)](https://codecov.io/gh/tenntenn/natureremo)
+
+[godoc]: http://godoc.org/github.com/tenntenn/natureremo
+[travis]: https://travis-ci.org/tenntenn/natureremo
 
 ## Install
 

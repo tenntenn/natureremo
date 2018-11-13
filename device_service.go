@@ -9,13 +9,17 @@ import (
 	"github.com/pkg/errors"
 )
 
-// DeviceService gets devices.
+// DeviceService provides interface of Nature Remo APIs which are related to devices.
 type DeviceService interface {
-	// GetAll gets devices.
+	// GetAll gets all information of devices which are related with user.
 	GetAll(ctx context.Context) ([]*Device, error)
+	// Update updates device information which exclude temperature offset and humidity offset.
 	Update(ctx context.Context, device *Device) (*Device, error)
+	// Delete deletes specified device.
 	Delete(ctx context.Context, device *Device) error
+	// UpdateTemperatureOffset updates temperature offset of specified device.
 	UpdateTemperatureOffset(ctx context.Context, device *Device) (*Device, error)
+	// UpdateHumidityOffset updates humidity offset of specified device.
 	UpdateHumidityOffset(ctx context.Context, device *Device) (*Device, error)
 }
 
@@ -23,7 +27,6 @@ type deviceService struct {
 	cli *Client
 }
 
-// GetAll send a GET request to /1/devices.
 func (s *deviceService) GetAll(ctx context.Context) ([]*Device, error) {
 	var ds []*Device
 	if err := s.cli.get(ctx, "devices", nil, &ds); err != nil {

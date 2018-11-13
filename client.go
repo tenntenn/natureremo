@@ -20,6 +20,7 @@ const (
 
 var apiURL = baseURL + version
 
+// Client is an API client for Nature Remo Cloud API.
 type Client struct {
 	UserService      UserService
 	DeviceService    DeviceService
@@ -30,6 +31,8 @@ type Client struct {
 	AccessToken string
 }
 
+// NewClient creates new client with access token of Nature Remo API.
+// You can get access token from https://home.nature.global/.
 func NewClient(accessToken string) *Client {
 	var cli Client
 	cli.AccessToken = accessToken

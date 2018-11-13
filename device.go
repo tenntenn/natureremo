@@ -2,13 +2,14 @@ package natureremo
 
 import "time"
 
-// Device represents a device on nature remo.
+// Device represents a device such as Nature Remo and Nature Remo Mini.
 type Device struct {
 	DeviceCore
+	// NewestEvents is newest sensor values such as temperature, humidity and illumination.
 	NewestEvents map[SensorType]SensorValue `json:"newest_events"`
 }
 
-// DeviceCore represents core infomation of a device.
+// DeviceCore represents core information of a device.
 type DeviceCore struct {
 	ID                string    `json:"id"`
 	Name              string    `json:"name"`

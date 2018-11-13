@@ -11,12 +11,19 @@ import (
 	"github.com/pkg/errors"
 )
 
+// SignalService provides interface of Nature Remo APIs which are related to signals.
 type SignalService interface {
+	// GetAll gets all signals which related to specified appliance.
 	GetAll(ctx context.Context, appliance *Appliance) ([]*Signal, error)
+	// New creates new signal and links to specified appliance.
 	New(ctx context.Context, appliance *Appliance, ir *IRSignal, name, image string) (*Signal, error)
+	// ReOrder arranges signals by given orders.
 	ReOrder(ctx context.Context, appliance *Appliance, signals []*Signal) error
+	// Update updates specified signal.
 	Update(ctx context.Context, signal *Signal) (*Signal, error)
+	// Delete deletes specified signal.
 	Delete(ctx context.Context, signal *Signal) error
+	// Send sends specified signal.
 	Send(ctx context.Context, signal *Signal) error
 }
 
