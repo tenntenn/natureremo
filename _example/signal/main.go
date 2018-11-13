@@ -12,30 +12,28 @@ func main() {
 	cli := natureremo.NewClient(os.Args[1])
 	ctx := context.Background()
 
+	applianceName := os.Args[2]
+	signalName := os.Args[3]
+
 	as, err := cli.ApplianceService.GetAll(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	const (
-		applianceTV   = "テレビ" // means TV in Japan
-		signalChannel = "日テレ" // is one of channels in Japan
-	)
-
-	var tv *natureremo.Appliance
+	var target *natureremo.Appliance
 	for _, a := range as {
-		if a.Nickname == applianceTV {
-			tv = a
+		if a.Nickname == applianceName {
+			target = a
 			break
 		}
 	}
 
-	if tv == nil {
-		log.Fatal("TV not found")
+	if target == nil {
+		log.Fatalf("%s not found", applianceName)
 	}
 
-	for _, s := range tv.Signals {
-		if s.Name == signalChannel {
+	for _, s := range target.Signals {
+		if s.Name == signalName {
 			cli.SignalService.Send(ctx, s)
 			break
 		}
