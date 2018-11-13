@@ -20,9 +20,14 @@ func main() {
 		}
 
 		for _, d := range ds {
+			if len(ds) > 1 {
+				fmt.Println("===", d.Name, "===")
+			}
+
 			fmt.Println("Temperature:", d.NewestEvents[natureremo.SensorTypeTemperature].Value, "°C")
 			fmt.Println("Humidity:", d.NewestEvents[natureremo.SensorTypeHumidity].Value, "%")
 			fmt.Println("illumination:", d.NewestEvents[natureremo.SensortypeIllumination].Value)
+			fmt.Println("")
 		}
 
 		time.Sleep(60 * time.Second)
