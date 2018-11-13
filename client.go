@@ -18,8 +18,6 @@ const (
 	version = "1"
 )
 
-var apiURL = baseURL + version
-
 // Client is an API client for Nature Remo Cloud API.
 type Client struct {
 	UserService      UserService
@@ -29,6 +27,7 @@ type Client struct {
 
 	HTTPClient  *http.Client
 	AccessToken string
+	BaseURL     string
 }
 
 // NewClient creates new client with access token of Nature Remo API.
@@ -40,6 +39,7 @@ func NewClient(accessToken string) *Client {
 	cli.DeviceService = &deviceService{cli: &cli}
 	cli.ApplianceService = &applianceService{cli: &cli}
 	cli.SignalService = &signalService{cli: &cli}
+	cli.BaseURL = baseURL + version
 	return &cli
 }
 
@@ -57,7 +57,7 @@ func (cli *Client) do(ctx context.Context, req *http.Request) (*http.Response, e
 }
 
 func (cli *Client) get(ctx context.Context, path string, params url.Values, v interface{}) error {
-	reqURL := apiURL + "/" + path
+	reqURL := cli.BaseURL + "/" + path
 	if params != nil {
 		reqURL += "?" + params.Encode()
 	}
@@ -86,7 +86,7 @@ func (cli *Client) get(ctx context.Context, path string, params url.Values, v in
 }
 
 func (cli *Client) postForm(ctx context.Context, path string, data url.Values, v interface{}) error {
-	reqURL := apiURL + "/" + path
+	reqURL := cli.BaseURL + "/" + path
 	body := strings.NewReader(data.Encode())
 	req, err := http.NewRequest(http.MethodPost, reqURL, body)
 	if err != nil {
@@ -127,7 +127,7 @@ func (cli *Client) postForm(ctx context.Context, path string, data url.Values, v
 }
 
 func (cli *Client) post(ctx context.Context, path string, v interface{}) error {
-	reqURL := apiURL + "/" + path
+	reqURL := cli.BaseURL + "/" + path
 	req, err := http.NewRequest(http.MethodPost, reqURL, nil)
 	if err != nil {
 		return errors.Wrap(err, "cannot create HTTP request")
