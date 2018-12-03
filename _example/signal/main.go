@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"log"
 	"os"
 
@@ -13,29 +14,43 @@ func main() {
 	ctx := context.Background()
 
 	applianceName := os.Args[2]
-	signalName := os.Args[3]
 
-	as, err := cli.ApplianceService.GetAll(ctx)
+	a, err := getAppliance(ctx, cli, applianceName)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	var target *natureremo.Appliance
+	signalName := os.Args[3]
+	s := getSignal(a.Signals, signalName)
+	if s == nil {
+		log.Fatal("signal not found")
+	}
+
+	if err := cli.SignalService.Send(ctx, s); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func getAppliance(ctx context.Context, cli *natureremo.Client, name string) (*natureremo.Appliance, error) {
+	as, err := cli.ApplianceService.GetAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	for _, a := range as {
-		if a.Nickname == applianceName {
-			target = a
-			break
+		if a.Nickname == name {
+			return a, nil
 		}
 	}
 
-	if target == nil {
-		log.Fatalf("%s not found", applianceName)
-	}
+	return nil, errors.New("appliance not found")
+}
 
-	for _, s := range target.Signals {
-		if s.Name == signalName {
-			cli.SignalService.Send(ctx, s)
-			break
+func getSignal(ss []*natureremo.Signal, name string) *natureremo.Signal {
+	for _, s := range ss {
+		if s.Name == name {
+			return s
 		}
 	}
+	return nil
 }

@@ -14,6 +14,18 @@ type Appliance struct {
 	AirCon         *AirCon         `json:"aircon"`
 }
 
+// SignalByName gets a signal by name from Signals.
+// If there are not any signals which have specified name,
+// SignalByName returns nil.
+func (a *Appliance) SignalByName(name string) *Signal {
+	for _, s := range a.Signals {
+		if s.Name == name {
+			return s
+		}
+	}
+	return nil
+}
+
 // ApplianceType represents type of appliance.
 type ApplianceType string
 
