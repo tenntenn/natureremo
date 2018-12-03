@@ -30,6 +30,7 @@ func main() {
 			fmt.Println("")
 		}
 
-		time.Sleep(60 * time.Second)
+		d := cli.LastRateLimit.Reset.Sub(time.Now())
+		time.Sleep(d / time.Duration(cli.LastRateLimit.Remaining))
 	}
 }
