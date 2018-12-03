@@ -8,7 +8,9 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/pkg/errors"
 )
@@ -25,9 +27,10 @@ type Client struct {
 	ApplianceService ApplianceService
 	SignalService    SignalService
 
-	HTTPClient  *http.Client
-	AccessToken string
-	BaseURL     string
+	HTTPClient    *http.Client
+	AccessToken   string
+	BaseURL       string
+	LastRateLimit *RateLimit
 }
 
 // NewClient creates new client with access token of Nature Remo API.
@@ -73,6 +76,12 @@ func (cli *Client) get(ctx context.Context, path string, params url.Values, v in
 	}
 
 	defer resp.Body.Close()
+
+	rl, err := RateLimitFromHeader(resp.Header)
+	if err != nil {
+		return err
+	}
+	cli.LastRateLimit = rl
 
 	if !(resp.StatusCode >= http.StatusOK && resp.StatusCode < http.StatusMultipleChoices) {
 		return cli.error(resp.StatusCode, resp.Body)
@@ -161,4 +170,52 @@ func (cli *Client) error(statusCode int, body io.Reader) error {
 		return errors.Errorf("request failed with status code %d", statusCode)
 	}
 	return errors.Errorf("StatusCode: %d, Error: %s", statusCode, string(buf))
+}
+
+// RateLimit has values of X-Rate-Limit-* in the response header.
+type RateLimit struct {
+	// Limit is a limit of request.
+	Limit int64
+	// Remaining is remaining request count.
+	Remaining int64
+	// Reset is time which a limit of request would be reseted.
+	Reset time.Time
+}
+
+func RateLimitFromHeader(h http.Header) (*RateLimit, error) {
+	ls := h.Get("X-Rate-Limit-Limit")
+	if ls == "" {
+		return nil, errors.New("cannot get X-Rate-Limit-Limit from header")
+	}
+
+	l, err := strconv.ParseInt(ls, 10, 64)
+	if err != nil {
+		return nil, errors.Wrap(err, "X-Rate-Limit-Limit is invalid value")
+	}
+
+	rs := h.Get("X-Rate-Limit-Remaining")
+	if rs == "" {
+		return nil, errors.New("cannot get X-Rate-Limit-Remaining from header")
+	}
+
+	r, err := strconv.ParseInt(rs, 10, 64)
+	if err != nil {
+		return nil, errors.Wrap(err, "X-Rate-Limit-Remaining is invalid value")
+	}
+
+	ts := h.Get("X-Rate-Limit-Reset")
+	if ts == "" {
+		return nil, errors.New("cannot get X-Rate-Limit-Reset from header")
+	}
+
+	t, err := strconv.ParseInt(ts, 10, 64)
+	if err != nil {
+		return nil, errors.Wrap(err, "X-Rate-Limit-Reset is invalid value")
+	}
+
+	return &RateLimit{
+		Limit:     l,
+		Remaining: r,
+		Reset:     time.Unix(t, 0),
+	}, nil
 }
