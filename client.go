@@ -22,6 +22,12 @@ const (
 	apiVersion = "1"
 )
 
+var defaultUserAgent string
+
+func init() {
+	defaultUserAgent = "tenntenn-natureremo/" + version + " (+https://github.com/tenntenn/natureremo)"
+}
+
 // Client is an API client for Nature Remo Cloud API.
 type Client struct {
 	UserService      UserService
@@ -46,7 +52,15 @@ func NewClient(accessToken string) *Client {
 	cli.ApplianceService = &applianceService{cli: &cli}
 	cli.SignalService = &signalService{cli: &cli}
 	cli.BaseURL = baseURL + apiVersion
+	cli.UserAgent = defaultUserAgent
 	return &cli
+}
+
+func (cli *Client) getUA() string {
+	if cli.UserAgent != "" {
+		return cli.UserAgent
+	}
+	return defaultUserAgent
 }
 
 func (cli *Client) httpClient() *http.Client {
@@ -59,6 +73,7 @@ func (cli *Client) httpClient() *http.Client {
 func (cli *Client) do(ctx context.Context, req *http.Request) (*http.Response, error) {
 	req = req.WithContext(ctx)
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", cli.AccessToken))
+	req.Header.Set("User-Agent", cli.getUA())
 	return cli.httpClient().Do(req)
 }
 
