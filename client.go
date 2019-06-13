@@ -15,6 +15,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+const version = "0.0.1"
+
 const (
 	baseURL    = "https://api.nature.global/"
 	apiVersion = "1"
