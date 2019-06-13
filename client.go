@@ -16,8 +16,8 @@ import (
 )
 
 const (
-	baseURL = "https://api.nature.global/"
-	version = "1"
+	baseURL    = "https://api.nature.global/"
+	apiVersion = "1"
 )
 
 // Client is an API client for Nature Remo Cloud API.
@@ -30,6 +30,7 @@ type Client struct {
 	HTTPClient    *http.Client
 	AccessToken   string
 	BaseURL       string
+	UserAgent     string
 	LastRateLimit *RateLimit
 }
 
@@ -42,7 +43,7 @@ func NewClient(accessToken string) *Client {
 	cli.DeviceService = &deviceService{cli: &cli}
 	cli.ApplianceService = &applianceService{cli: &cli}
 	cli.SignalService = &signalService{cli: &cli}
-	cli.BaseURL = baseURL + version
+	cli.BaseURL = baseURL + apiVersion
 	return &cli
 }
 
