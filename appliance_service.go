@@ -29,6 +29,8 @@ type ApplianceService interface {
 	Update(ctx context.Context, appliance *Appliance) (*Appliance, error)
 	// UpdateAirConSettings updates air conditioner settings of specified appliance.
 	UpdateAirConSettings(ctx context.Context, appliance *Appliance, settings *AirConSettings) error
+	// SendTVSignal sends TV infrared signal.
+	SendTVSignal(ctx context.Context, appliance *Appliance, buttonName string) (*TVState, error)
 }
 
 type applianceService struct {
@@ -129,4 +131,17 @@ func (s *applianceService) UpdateAirConSettings(ctx context.Context, appliance *
 		return errors.Wrapf(err, "POST %s with %#v", path, data)
 	}
 	return nil
+}
+
+func (s *applianceService) SendTVSignal(ctx context.Context, appliance *Appliance, buttonName string) (*TVState, error) {
+	path := fmt.Sprintf("appliances/%s/tv", appliance.ID)
+
+	data := url.Values{}
+	data.Set("button", buttonName)
+
+	var status TVState
+	if err := s.cli.postForm(ctx, path, data, &status); err != nil {
+		return nil, errors.Wrapf(err, "POST %s with %#v", path, data)
+	}
+	return &status, nil
 }
