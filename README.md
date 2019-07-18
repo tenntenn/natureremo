@@ -72,8 +72,8 @@ http://swagger.nature.global
 |:heavy_check_mark:|/1/appliances/{appliance}/delete         | POST        |[ApplianceService](https://godoc.org/github.com/tenntenn/natureremo#ApplianceService)|
 |:heavy_check_mark:|/1/appliances/{appliance}                | POST        |[ApplianceService](https://godoc.org/github.com/tenntenn/natureremo#ApplianceService)|
 |:heavy_check_mark:|/1/appliances/{appliance}/aircon_settings| POST        |[ApplianceService](https://godoc.org/github.com/tenntenn/natureremo#ApplianceService)|
-|                  |/1/appliances/{appliance}/tv             | POST        |                                                                                     |
-|                  |/1/appliances/{appliance}/light          | POST        |                                                                                     |
+|:heavy_check_mark:|/1/appliances/{appliance}/tv             | POST        |[ApplianceService](https://godoc.org/github.com/tenntenn/natureremo#ApplianceService)|
+|:heavy_check_mark:|/1/appliances/{appliance}/light          | POST        |[ApplianceService](https://godoc.org/github.com/tenntenn/natureremo#ApplianceService)|
 |:heavy_check_mark:|/1/appliances/{appliance}/signals        | GET         |[SignalService](https://godoc.org/github.com/tenntenn/natureremo#SignalService)   |
 |:heavy_check_mark:|/1/appliances/{appliance}/signals        | POST        |[SignalService](https://godoc.org/github.com/tenntenn/natureremo#SignalService)   |
 |:heavy_check_mark:|/1/appliances/{appliance}/signal_orders  | POST        |[SignalService](https://godoc.org/github.com/tenntenn/natureremo#SignalService)   |
