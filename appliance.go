@@ -12,6 +12,8 @@ type Appliance struct {
 	Signals        []*Signal       `json:"signals"`
 	AirConSettings *AirConSettings `json:"settings"`
 	AirCon         *AirCon         `json:"aircon"`
+	TV             *TV             `json:"tv"`
+	Light          *Light          `json:"light"`
 }
 
 // SignalByName gets a signal by name from Signals.
@@ -32,6 +34,10 @@ type ApplianceType string
 const (
 	// ApplianceTypeAirCon represents an air conditioner.
 	ApplianceTypeAirCon ApplianceType = "AC"
+	// ApplianceTypeTV represents an TV
+	ApplianceTypeTV ApplianceType = "TV"
+	// ApplianceTypeLight represents Light
+	ApplianceTypeLight ApplianceType = "LIGHT"
 	// ApplianceTypeIR represents a device which is controlled by infrared.
 	ApplianceTypeIR ApplianceType = "IR"
 )
