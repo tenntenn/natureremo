@@ -3,6 +3,7 @@ module github.com/tenntenn/natureremo/_example/airconbot
 go 1.13
 
 require (
+	github.com/line/line-bot-sdk-go v6.3.0+incompatible
 	github.com/tenntenn/natureremo v0.0.1
 	go.mercari.io/datastore v1.6.1
 	go.uber.org/atomic v1.4.0 // indirect
