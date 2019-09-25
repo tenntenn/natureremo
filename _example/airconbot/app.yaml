@@ -1,0 +1,5 @@
+runtime: go112
+
+env_variables:
+  NATUREREMO_TOKEN: "TODO"
+  WEBHOOK_TOKEN: "TODO"
