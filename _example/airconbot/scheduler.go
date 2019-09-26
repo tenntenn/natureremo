@@ -23,7 +23,17 @@ type Schedule struct {
 }
 
 func (s *Schedule) String() string {
-	mode := "エアコン"
+	date, aircon, mode, button := s.Format()
+	return fmt.Sprintf("%sに%sの%sを%s", date, aircon, mode, button)
+}
+
+func (s *Schedule) Format() (date, aircon, mode, button string) {
+	tm := time.Unix(s.ScheduledAt, 0).In(jstTz)
+	date = tm.Format("2006年01月02日 15時04分")
+
+	aircon = s.ApplianceName
+
+	mode = "エアコン"
 	switch s.Mode {
 	case natureremo.OperationModeWarm:
 		mode = "暖房"
@@ -31,14 +41,12 @@ func (s *Schedule) String() string {
 		mode = "冷房"
 	}
 
-	button := "ON"
+	button = "ON"
 	if s.Button == natureremo.ButtonPowerOff {
 		button = "OFF"
 	}
 
-	tm := time.Unix(s.ScheduledAt, 0).In(jstTz)
-	date := tm.Format("2006/01/02 15:04")
-	return fmt.Sprintf("%sに%sの%sを%s", date, s.ApplianceName, mode, button)
+	return
 }
 
 type Scheduler struct {
@@ -51,6 +59,22 @@ func NewScheduler(ncli *natureremo.Client, bot *linebot.Client) *Scheduler {
 		ncli: ncli,
 		bot:  bot,
 	}
+}
+
+func (s *Scheduler) GetAll(ctx context.Context) ([]*Schedule, error) {
+	client, err := clouddatastore.FromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer client.Close()
+
+	var schedules []*Schedule
+	q := client.NewQuery("Schedule").Order("-scheduled_at")
+	if _, err := client.GetAll(ctx, q, &schedules); err != nil {
+		return nil, err
+	}
+
+	return schedules, nil
 }
 
 func (s *Scheduler) RunAll(ctx context.Context, now int64) error {
@@ -93,7 +117,7 @@ func (s *Scheduler) RunAll(ctx context.Context, now int64) error {
 			strs[i] = schedules[i].String()
 		}
 		msg := linebot.NewTextMessage(strings.Join(strs, "、") + "にしました")
-		if _, err := s.bot.BroadcastMessage(linebot.SendingMessage(msg)).WithContext(ctx).Do(); err != nil {
+		if _, err := s.bot.BroadcastMessage(msg).WithContext(ctx).Do(); err != nil {
 			return err
 		}
 	}
@@ -143,6 +167,36 @@ func (s *Scheduler) Register(ctx context.Context, sch *Schedule) error {
 	}
 
 	log.Println(sch)
+
+	return nil
+}
+
+func (s *Scheduler) Delete(ctx context.Context, sch *Schedule) error {
+	client, err := clouddatastore.FromContext(ctx)
+	if err != nil {
+		return err
+	}
+	defer client.Close()
+
+	var schedules []*Schedule
+	q := client.NewQuery("Schedule").Filter("scheduled_at = ", sch.ScheduledAt)
+	keys, err := client.GetAll(ctx, q, &schedules)
+	if err != nil && err != datastore.ErrNoSuchEntity {
+		return err
+	}
+
+	var deletes []datastore.Key
+	for i := range schedules {
+		if schedules[i].String() == sch.String() {
+			deletes = append(deletes, keys[i])
+		}
+	}
+
+	if len(deletes) > 0 {
+		if err := client.DeleteMulti(ctx, deletes); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
