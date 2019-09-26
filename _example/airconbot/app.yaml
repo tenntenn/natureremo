@@ -1,7 +1,0 @@
-runtime: go112
-
-env_variables:
-  NATUREREMO_TOKEN: ""
-  WEBHOOK_TOKEN: ""
-  LINE_ACCESS_TOKEN: ""
-  LINE_CHANNEL_SECRET: ""

@@ -17,16 +17,15 @@ func main() {
 	hostport := net.JoinHostPort("", port)
 
 	ncli := natureremo.NewClient(os.Getenv("NATUREREMO_TOKEN"))
-	sch := NewScheduler(ncli)
 	bot, err := linebot.New(
-		os.Getenv("LINE_CHANNEL_SECRET"),
-		os.Getenv("LINE_ACCESS_TOKEN"),
+		os.Getenv("LINE_SECRET"),
+		os.Getenv("LINE_TOKEN"),
 	)
 	if err != nil {
 		panic(err)
 	}
-	webhookToken := os.Getenv("WEBHOOK_TOKEN")
-	server := NewServer(sch, bot, webhookToken)
+	sch := NewScheduler(ncli, bot)
+	server := NewServer(sch)
 
 	http.ListenAndServe(hostport, server)
 }

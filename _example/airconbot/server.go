@@ -3,23 +3,17 @@ package main
 import (
 	"net/http"
 	"sync"
-
-	"github.com/line/line-bot-sdk-go/linebot"
 )
 
 type Server struct {
-	initOnce     sync.Once
-	router       http.ServeMux
-	scheduler    *Scheduler
-	bot          *linebot.Client
-	webhookToken string
+	initOnce  sync.Once
+	router    http.ServeMux
+	scheduler *Scheduler
 }
 
-func NewServer(sch *Scheduler, bot *linebot.Client, webhookToken string) *Server {
+func NewServer(sch *Scheduler) *Server {
 	s := &Server{
-		scheduler:    sch,
-		bot:          bot,
-		webhookToken: webhookToken,
+		scheduler: sch,
 	}
 	s.initOnce.Do(s.initHandler)
 	return s
@@ -31,6 +25,5 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) initHandler() {
 	s.router.HandleFunc("/cron/checkAndRun", s.handleCheckAndRun)
-	s.router.HandleFunc("/register", s.handleRegister)
 	s.router.HandleFunc("/bot/message", s.handleBotMessage)
 }

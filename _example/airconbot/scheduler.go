@@ -2,7 +2,12 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"log"
+	"strings"
+	"time"
 
+	"github.com/line/line-bot-sdk-go/linebot"
 	"github.com/tenntenn/natureremo"
 	"go.mercari.io/datastore"
 	"go.mercari.io/datastore/clouddatastore"
@@ -10,18 +15,41 @@ import (
 )
 
 type Schedule struct {
-	ScheduledAt int64             `json:"scheduledAt" datastore:"scheduled_at"`
-	ApplianceID string            `json:"applianceId" datastore:"appliance_id"`
-	Button      natureremo.Button `json:"button" datastore:"button"`
+	ScheduledAt   int64                    `datastore:"scheduled_at"`
+	ApplianceName string                   `datastore:"appliance_name"`
+	ApplianceID   string                   `datastore:"appliance_id"`
+	Button        natureremo.Button        `datastore:"button"`
+	Mode          natureremo.OperationMode `datastore:"mode"`
+}
+
+func (s *Schedule) String() string {
+	mode := "エアコン"
+	switch s.Mode {
+	case natureremo.OperationModeWarm:
+		mode = "暖房"
+	case natureremo.OperationModeCool:
+		mode = "冷房"
+	}
+
+	button := "ON"
+	if s.Button == natureremo.ButtonPowerOff {
+		button = "OFF"
+	}
+
+	tm := time.Unix(s.ScheduledAt, 0).In(jstTz)
+	date := tm.Format("2006/01/02 15:04")
+	return fmt.Sprintf("%sに%sの%sを%s", date, s.ApplianceName, mode, button)
 }
 
 type Scheduler struct {
 	ncli *natureremo.Client
+	bot  *linebot.Client
 }
 
-func NewScheduler(ncli *natureremo.Client) *Scheduler {
+func NewScheduler(ncli *natureremo.Client, bot *linebot.Client) *Scheduler {
 	return &Scheduler{
 		ncli: ncli,
+		bot:  bot,
 	}
 }
 
@@ -59,6 +87,17 @@ func (s *Scheduler) RunAll(ctx context.Context, now int64) error {
 		return errs
 	}
 
+	if len(schedules) > 0 {
+		strs := make([]string, len(schedules))
+		for i := range schedules {
+			strs[i] = schedules[i].String()
+		}
+		msg := linebot.NewTextMessage(strings.Join(strs, "、") + "にしました")
+		if _, err := s.bot.BroadcastMessage(linebot.SendingMessage(msg)).WithContext(ctx).Do(); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -77,10 +116,15 @@ func (s *Scheduler) Run(ctx context.Context, sch *Schedule) error {
 		settings := *(a.AirConSettings)
 		settings.Button = sch.Button
 
+		if sch.Mode != "" {
+			settings.OperationMode = sch.Mode
+		}
+
 		err := s.ncli.ApplianceService.UpdateAirConSettings(ctx, a, &settings)
 		if err != nil {
 			return err
 		}
+		break
 	}
 
 	return nil
@@ -97,6 +141,8 @@ func (s *Scheduler) Register(ctx context.Context, sch *Schedule) error {
 	if _, err := client.Put(ctx, key, sch); err != nil {
 		return err
 	}
+
+	log.Println(sch)
 
 	return nil
 }
