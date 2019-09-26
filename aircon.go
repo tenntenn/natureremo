@@ -78,7 +78,7 @@ func (v AirVolume) StringValue() string {
 
 const (
 	// AirVolumeAuto represents auto.
-	AirVolumeAuto = ""
+	AirVolumeAuto = "auto"
 	// AirVolume1 represents volume 1.
 	AirVolume1 = "1"
 	// AirVolume2 represents volume 2.
