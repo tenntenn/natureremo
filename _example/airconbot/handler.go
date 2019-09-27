@@ -29,11 +29,16 @@ func (s *Server) handleCheckAndRun(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (s *Server) basicAuth(r *http.Request) bool {
+	user, pass, ok := r.BasicAuth()
+	return ok &&
+		s.DialogflowBasicAuth == BasicAuth{User: user, Pass: pass}
+}
+
 func (s *Server) handleBotMessage(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	user, pass, ok := r.BasicAuth()
-	if !(ok && user == "tenntenn" && pass == "tenntenn") {
+	if !s.basicAuth(r) {
 		code := http.StatusUnauthorized
 		http.Error(w, http.StatusText(code), code)
 		return
