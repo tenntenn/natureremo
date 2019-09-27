@@ -105,8 +105,6 @@ func (s *Server) reserve(ctx context.Context, w http.ResponseWriter, r *dialogfl
 }
 
 func (s *Server) list(ctx context.Context, w http.ResponseWriter, r *dialogflow.Request) {
-	var msgs dialogflow.Messages
-
 	schs, err := s.scheduler.GetAll(ctx)
 	if err != nil && err != datastore.ErrNoSuchEntity {
 		code := http.StatusInternalServerError
@@ -116,13 +114,21 @@ func (s *Server) list(ctx context.Context, w http.ResponseWriter, r *dialogflow.
 	}
 
 	if len(schs) == 0 {
-		msg := linebot.NewTextMessage("予約はありません")
-		msgs = append(msgs, dialogflow.Message{
-			Platform: dialogflow.Line,
-			RichMessage: dialogflow.PayloadWrapper{Payload: map[string]interface{}{
-				"line": msg,
-			}},
-		})
+		dff := &dialogflow.Fulfillment{
+			FulfillmentMessages: dialogflow.Messages{
+				dialogflow.Message{
+					Platform: dialogflow.Line,
+					RichMessage: dialogflow.PayloadWrapper{Payload: map[string]interface{}{
+						"line": linebot.NewTextMessage("予約はありません"),
+					}},
+				},
+			},
+		}
+		w.Header().Set("Content-Type", "application/json")
+		if err := json.NewEncoder(w).Encode(dff); err != nil {
+			log.Println("Error:", err)
+		}
+		return
 	}
 
 	var cols []*linebot.CarouselColumn
