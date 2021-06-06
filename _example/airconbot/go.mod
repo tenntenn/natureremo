@@ -1,6 +1,6 @@
 module github.com/tenntenn/natureremo/_example/airconbot
 
-go 1.13
+go 1.16
 
 require (
 	github.com/leboncoin/dialogflow-go-webhook v1.1.0
