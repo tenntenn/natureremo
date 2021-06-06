@@ -1,0 +1,4 @@
+cron:
+- description: "check schedule and run"
+  url: /cron/checkAndRun
+  schedule: every 1 minutes

@@ -1,0 +1,14 @@
+runtime: go112
+
+env_variables:
+  NATUREREMO_TOKEN: ""
+  AIRCON1_NAME: "LivingRoom"
+  AIRCON1_ID: ""
+  AIRCON2_NAME: "BedRoom1"
+  AIRCON2_ID: ""
+  AIRCON3_NAME: "BedRoom2"
+  AIRCON3_ID: ""
+  LINE_TOKEN: ""
+  LINE_SECRET: ""
+  DIALOGFLOW_BASIC_AUTH_USER: ""
+  DIALOGFLOW_BASIC_AUTH_PASS: ""
