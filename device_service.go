@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"net/url"
 	"strconv"
-
-	"github.com/pkg/errors"
 )
 
 // DeviceService provides interface of Nature Remo APIs which are related to devices.
@@ -30,7 +28,7 @@ type deviceService struct {
 func (s *deviceService) GetAll(ctx context.Context) ([]*Device, error) {
 	var ds []*Device
 	if err := s.cli.get(ctx, "devices", nil, &ds); err != nil {
-		return nil, errors.Wrap(err, "GET deviecs failed")
+		return nil, fmt.Errorf("GET deviecs failed: %w", err)
 	}
 	return ds, nil
 }
@@ -43,7 +41,7 @@ func (s *deviceService) Update(ctx context.Context, device *Device) (*Device, er
 
 	var d Device
 	if err := s.cli.postForm(ctx, path, data, &d); err != nil {
-		return nil, errors.Wrapf(err, "POST %s with %#v", path, data)
+		return nil, fmt.Errorf("POST %s with %#v: %w", path, data, err)
 	}
 
 	return &d, nil
@@ -52,7 +50,7 @@ func (s *deviceService) Update(ctx context.Context, device *Device) (*Device, er
 func (s *deviceService) Delete(ctx context.Context, device *Device) error {
 	path := fmt.Sprintf("devices/%s/delete", device.ID)
 	if err := s.cli.post(ctx, path, nil); err != nil {
-		return errors.Wrapf(err, "POST %s failed", path)
+		return fmt.Errorf("POST %s failed: %w", path, err)
 	}
 	return nil
 }
@@ -65,7 +63,7 @@ func (s *deviceService) UpdateTemperatureOffset(ctx context.Context, device *Dev
 
 	var d Device
 	if err := s.cli.postForm(ctx, path, data, &d); err != nil {
-		return nil, errors.Wrapf(err, "POST %s with %#v", path, data)
+		return nil, fmt.Errorf("POST %s with %#v: %w", path, data, err)
 	}
 
 	return &d, nil
@@ -79,7 +77,7 @@ func (s *deviceService) UpdateHumidityOffset(ctx context.Context, device *Device
 
 	var d Device
 	if err := s.cli.postForm(ctx, path, data, &d); err != nil {
-		return nil, errors.Wrapf(err, "POST %s with %#v", path, data)
+		return nil, fmt.Errorf("POST %s with %#v: %w", path, data, err)
 	}
 
 	return &d, nil

@@ -7,8 +7,6 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 // ApplianceService provides interface of Nature Remo APIs which are related to appliances.
@@ -43,13 +41,13 @@ func (s *applianceService) Detect(ctx context.Context, ir *IRSignal) ([]*Detecte
 	data := url.Values{}
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(ir); err != nil {
-		return nil, errors.Wrapf(err, "cannot encode IRSignal %v", ir)
+		return nil, fmt.Errorf("cannot encode IRSignal %v: %w", ir, err)
 	}
 
 	data.Set("message", buf.String())
 	var aircons []*DetectedAirCon
 	if err := s.cli.postForm(ctx, "detectappliance", data, &aircons); err != nil {
-		return nil, errors.Wrapf(err, "POST detectappliance failed with %#v", ir)
+		return nil, fmt.Errorf("POST detectappliance failed with %#v: %w", ir, err)
 	}
 	return aircons, nil
 }
@@ -57,7 +55,7 @@ func (s *applianceService) Detect(ctx context.Context, ir *IRSignal) ([]*Detecte
 func (s *applianceService) GetAll(ctx context.Context) ([]*Appliance, error) {
 	var as []*Appliance
 	if err := s.cli.get(ctx, "appliances", nil, &as); err != nil {
-		return nil, errors.Wrap(err, "GET appliances failed")
+		return nil, fmt.Errorf("GET appliances failed: %w", err)
 	}
 	return as, nil
 }
@@ -77,7 +75,7 @@ func (s *applianceService) NewWithModel(ctx context.Context, device *Device, nic
 
 	var a Appliance
 	if err := s.cli.postForm(ctx, "appliances", data, &a); err != nil {
-		return nil, errors.Wrapf(err, "POST appliances failed with %#v", data)
+		return nil, fmt.Errorf("POST appliances failed with %#v: %w", data, err)
 	}
 	return &a, nil
 }
@@ -92,7 +90,7 @@ func (s *applianceService) ReOrder(ctx context.Context, appliances []*Appliance)
 	data.Set("appliances", strings.Join(ids, ","))
 
 	if err := s.cli.postForm(ctx, "appliance_orders", data, nil); err != nil {
-		return errors.Wrapf(err, "POST appliance_orders failed with %#v", data)
+		return fmt.Errorf("POST appliance_orders failed with %#v: %w", data, err)
 	}
 	return nil
 }
@@ -100,7 +98,7 @@ func (s *applianceService) ReOrder(ctx context.Context, appliances []*Appliance)
 func (s *applianceService) Delete(ctx context.Context, appliance *Appliance) error {
 	path := fmt.Sprintf("appliances/%s/delete", appliance.ID)
 	if err := s.cli.post(ctx, path, nil); err != nil {
-		return errors.Wrapf(err, "POST %s", path)
+		return fmt.Errorf("POST %s: %w", path, err)
 	}
 	return nil
 }
@@ -114,7 +112,7 @@ func (s *applianceService) Update(ctx context.Context, appliance *Appliance) (*A
 
 	var a Appliance
 	if err := s.cli.postForm(ctx, path, data, &a); err != nil {
-		return nil, errors.Wrapf(err, "POST %s with %#v", path, data)
+		return nil, fmt.Errorf("POST %s with %#v: %w", path, data, err)
 	}
 	return &a, nil
 }
@@ -130,7 +128,7 @@ func (s *applianceService) UpdateAirConSettings(ctx context.Context, appliance *
 	data.Set("button", settings.Button.StringValue())
 
 	if err := s.cli.postForm(ctx, path, data, nil); err != nil {
-		return errors.Wrapf(err, "POST %s with %#v", path, data)
+		return fmt.Errorf("POST %s with %#v: %w", path, data, err)
 	}
 	return nil
 }
@@ -143,7 +141,7 @@ func (s *applianceService) SendTVSignal(ctx context.Context, appliance *Applianc
 
 	var status TVState
 	if err := s.cli.postForm(ctx, path, data, &status); err != nil {
-		return nil, errors.Wrapf(err, "POST %s with %#v", path, data)
+		return nil, fmt.Errorf("POST %s with %#v: %w", path, data, err)
 	}
 	return &status, nil
 }
@@ -156,7 +154,7 @@ func (s *applianceService) SendLightSignal(ctx context.Context, appliance *Appli
 
 	var status LightState
 	if err := s.cli.postForm(ctx, path, data, &status); err != nil {
-		return nil, errors.Wrapf(err, "POST %s with %#v", path, data)
+		return nil, fmt.Errorf("POST %s with %#v: %w", path, data, err)
 	}
 	return &status, nil
 }

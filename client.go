@@ -3,16 +3,14 @@ package natureremo
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/pkg/errors"
 )
 
 const version = "0.0.1"
@@ -85,7 +83,7 @@ func (cli *Client) get(ctx context.Context, path string, params url.Values, v in
 
 	req, err := http.NewRequest(http.MethodGet, reqURL, nil)
 	if err != nil {
-		return errors.Wrap(err, "cannot create HTTP request")
+		return fmt.Errorf("cannot create HTTP request: %w", err)
 	}
 
 	resp, err := cli.do(ctx, req)
@@ -95,18 +93,18 @@ func (cli *Client) get(ctx context.Context, path string, params url.Values, v in
 
 	defer resp.Body.Close()
 
+	if !(resp.StatusCode >= http.StatusOK && resp.StatusCode < http.StatusMultipleChoices) {
+		return cli.error(resp.StatusCode, resp.Body)
+	}
+
 	rl, err := RateLimitFromHeader(resp.Header)
 	if err != nil {
 		return err
 	}
 	cli.LastRateLimit = rl
 
-	if !(resp.StatusCode >= http.StatusOK && resp.StatusCode < http.StatusMultipleChoices) {
-		return cli.error(resp.StatusCode, resp.Body)
-	}
-
 	if err := json.NewDecoder(resp.Body).Decode(v); err != nil {
-		return errors.Wrap(err, "cannot parse HTTP body")
+		return fmt.Errorf("cannot parse HTTP body: %w", err)
 	}
 
 	return nil
@@ -117,7 +115,7 @@ func (cli *Client) postForm(ctx context.Context, path string, data url.Values, v
 	body := strings.NewReader(data.Encode())
 	req, err := http.NewRequest(http.MethodPost, reqURL, body)
 	if err != nil {
-		return errors.Wrap(err, "cannot create HTTP request")
+		return fmt.Errorf("cannot create HTTP request: %w", err)
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
@@ -141,13 +139,13 @@ func (cli *Client) postForm(ctx context.Context, path string, data url.Values, v
 	// For Debug
 	//var buf bytes.Buffer
 	//if _, err := buf.ReadFrom(resp.Body); err != nil {
-	//	return errors.Wrap(err, "cannot read HTTP body")
+	//	return fmt.Errorf("cannot parse HTTP body: %w")
 	//}
 	//fmt.Println(buf.String())
 	//respBody = &buf
 
 	if err := json.NewDecoder(respBody).Decode(v); err != nil {
-		return errors.Wrap(err, "cannot parse HTTP body")
+		return fmt.Errorf("cannot parse HTTP body: %w", err)
 	}
 
 	return nil
@@ -157,7 +155,7 @@ func (cli *Client) post(ctx context.Context, path string, v interface{}) error {
 	reqURL := cli.BaseURL + "/" + path
 	req, err := http.NewRequest(http.MethodPost, reqURL, nil)
 	if err != nil {
-		return errors.Wrap(err, "cannot create HTTP request")
+		return fmt.Errorf("cannot create HTTP request: %w", err)
 	}
 
 	resp, err := cli.do(ctx, req)
@@ -176,18 +174,19 @@ func (cli *Client) post(ctx context.Context, path string, v interface{}) error {
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(v); err != nil {
-		return errors.Wrap(err, "cannot parse HTTP body")
+		return fmt.Errorf("cannot parse HTTP body: %w", err)
 	}
 
 	return nil
 }
 
 func (cli *Client) error(statusCode int, body io.Reader) error {
-	buf, err := ioutil.ReadAll(body)
-	if err != nil || len(buf) == 0 {
-		return errors.Errorf("request failed with status code %d", statusCode)
+	var aerr APIError
+	if err := json.NewDecoder(body).Decode(&aerr); err != nil {
+		return &APIError{HTTPStatus: statusCode}
 	}
-	return errors.Errorf("StatusCode: %d, Error: %s", statusCode, string(buf))
+	aerr.HTTPStatus = statusCode
+	return &aerr
 }
 
 // RateLimit has values of X-Rate-Limit-* in the response header.
@@ -208,7 +207,7 @@ func RateLimitFromHeader(h http.Header) (*RateLimit, error) {
 
 	l, err := strconv.ParseInt(ls, 10, 64)
 	if err != nil {
-		return nil, errors.Wrap(err, "X-Rate-Limit-Limit is invalid value")
+		return nil, fmt.Errorf("X-Rate-Limit-Limit is invalid value: %w", err)
 	}
 
 	rs := h.Get("X-Rate-Limit-Remaining")
@@ -218,7 +217,7 @@ func RateLimitFromHeader(h http.Header) (*RateLimit, error) {
 
 	r, err := strconv.ParseInt(rs, 10, 64)
 	if err != nil {
-		return nil, errors.Wrap(err, "X-Rate-Limit-Remaining is invalid value")
+		return nil, fmt.Errorf("X-Rate-Limit-Remaining is invalid value: %w", err)
 	}
 
 	ts := h.Get("X-Rate-Limit-Reset")
@@ -228,7 +227,7 @@ func RateLimitFromHeader(h http.Header) (*RateLimit, error) {
 
 	t, err := strconv.ParseInt(ts, 10, 64)
 	if err != nil {
-		return nil, errors.Wrap(err, "X-Rate-Limit-Reset is invalid value")
+		return nil, fmt.Errorf("X-Rate-Limit-Reset is invalid value: %w", err)
 	}
 
 	return &RateLimit{
