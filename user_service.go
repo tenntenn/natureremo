@@ -2,9 +2,8 @@ package natureremo
 
 import (
 	"context"
+	"fmt"
 	"net/url"
-
-	"github.com/pkg/errors"
 )
 
 // UserService provides interface of Nature Remo APIs which are related to user.
@@ -22,7 +21,7 @@ type userService struct {
 func (s *userService) Me(ctx context.Context) (*User, error) {
 	var u User
 	if err := s.cli.get(ctx, "users/me", nil, &u); err != nil {
-		return nil, errors.Wrap(err, "GET users/me failed")
+		return nil, fmt.Errorf("GET users/me failed: %w", err)
 	}
 	return &u, nil
 }
@@ -32,7 +31,7 @@ func (s *userService) Update(ctx context.Context, me *User) (*User, error) {
 	data.Set("nickname", me.Nickname)
 	var u User
 	if err := s.cli.postForm(ctx, "users/me", data, &u); err != nil {
-		return nil, errors.Wrapf(err, "POST users/me failed with %#v", me)
+		return nil, fmt.Errorf("POST users/me failed with %#v: %w", me, err)
 	}
 	return &u, nil
 }
