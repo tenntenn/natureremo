@@ -26,7 +26,8 @@ func main() {
 
 			fmt.Println("Temperature:", d.NewestEvents[natureremo.SensorTypeTemperature].Value, "°C")
 			fmt.Println("Humidity:", d.NewestEvents[natureremo.SensorTypeHumidity].Value, "%")
-			fmt.Println("illumination:", d.NewestEvents[natureremo.SensortypeIllumination].Value)
+			fmt.Println("Illumination:", d.NewestEvents[natureremo.SensorTypeIllumination].Value)
+			fmt.Println("Movement:", d.NewestEvents[natureremo.SensorTypeMovement].Value)
 			fmt.Println("")
 		}
 

@@ -10,8 +10,10 @@ const (
 	SensorTypeTemperature SensorType = "te"
 	// SensorTypeHumidity represents a humidity sensor.
 	SensorTypeHumidity SensorType = "hu"
-	// SensortypeIllumination represents a illumination sensor.
-	SensortypeIllumination SensorType = "il"
+	// SensorTypeIllumination represents a illumination sensor.
+	SensorTypeIllumination SensorType = "il"
+	// SensorTypeMovement represents a movement sensor.
+	SensorTypeMovement SensorType = "mo"
 )
 
 // SensorValue represents value of sensor.
