@@ -46,6 +46,7 @@ const (
 // which is identified by Nature Remo API.
 type ApplianceModel struct {
 	ID           string `json:"id"`
+	Country      string `json:"country"`
 	Manufacturer string `json:"manufacturer"`
 	RemoteName   string `json:"remote_name"`
 	Name         string `json:"name"`
