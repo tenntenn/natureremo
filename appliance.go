@@ -45,7 +45,9 @@ const (
 // ApplianceModel is device information of appliance
 // which is identified by Nature Remo API.
 type ApplianceModel struct {
-	ID           string `json:"id"`
+	ID string `json:"id"`
+	// Not in swagger, but actually included in the response
+	Country      string `json:"country"`
 	Manufacturer string `json:"manufacturer"`
 	RemoteName   string `json:"remote_name"`
 	Name         string `json:"name"`

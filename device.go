@@ -18,4 +18,10 @@ type DeviceCore struct {
 	CreatedAt         time.Time `json:"created_at"`
 	UpdatedAt         time.Time `json:"updated_at"`
 	FirmwareVersion   string    `json:"firmware_version"`
+	MacAddress        string    `json:"mac_address"`
+	// Not in swagger, but actually included in the response
+	BtMacAddress string `json:"bt_mac_address"`
+	SerialNumber string `json:"serial_number"`
+	// Not in swagger, but actually included in the response
+	Users []User `json:"users"`
 }
