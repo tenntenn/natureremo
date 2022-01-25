@@ -28,7 +28,7 @@ type deviceService struct {
 func (s *deviceService) GetAll(ctx context.Context) ([]*Device, error) {
 	var ds []*Device
 	if err := s.cli.get(ctx, "devices", nil, &ds); err != nil {
-		return nil, fmt.Errorf("GET deviecs failed: %w", err)
+		return nil, fmt.Errorf("GET devices failed: %w", err)
 	}
 	return ds, nil
 }
